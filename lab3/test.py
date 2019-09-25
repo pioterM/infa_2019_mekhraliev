@@ -1,9 +1,9 @@
 from graph import *
 
 N = 200
-x1 = 100;
+x1 = 100
 y1 = 100
-x2 = x1 + 10 * N;
+x2 = x1 + 10 * N
 y2 = 200
 
 rectangle(x1, y1, x2, y2)
