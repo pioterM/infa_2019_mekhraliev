@@ -81,7 +81,7 @@ colors = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'ol
 'gray93', 'gray94', 'gray95', 'gray97', 'gray98', 'gray99']
 
 class Ball:
-    def __init__(self, canvas, x, y, r, v, a, kf = 0, flag = 0):
+    def __init__(self, canvas, x0,y0, x, y, r, v, a, kf = 0, flag = 0):
         self.x = x
         self.y = y
         self.r = r
@@ -115,18 +115,23 @@ canv.pack(fill=BOTH,expand=1)
 
 
 def new_ball():
-    canv.delete(ALL) #удаление всего нарисованного с холста (пока это один шарик)
-    x = rnd(100,700) #выбор рандомных значений шарика
-    y = rnd(100,500)
+    x = x0 = rnd(100,700) #выбор рандомных значений шарика
+    y = y0 = rnd(100,500)
     r = rnd(30,50)
     a = rnd(0,int(2*math.pi*100000))
-    v = 100
+    v = rnd(100,500)
     global ball1
-    ball1 = Ball(canv, x,y,r, v, a)
+    ball1 = Ball(canv,x0,y0,x,y,r,v,a)
     move_ball()
 
+def create_balls(n):
+    balls_list=[]
+    for i in range(10):
+        balls_list.append(Ball())
+
+
 def move_ball():
-    if ball1.kf != 1 and ball1.flag < 300 :
+    if ball1.kf != 1 and ball1.flag < 500 :
         ball1.flag += 1
         dx=dy=0
         dx = ball1.v*math.cos(ball1.a/100000)/100
@@ -134,9 +139,17 @@ def move_ball():
         ball1.x +=dx
         ball1.y +=dy
         canv.move(ball1.ball, dx, dy)
+        rebound_ball()
         root.after(10, move_ball)
     else :
+        ball1.canvas.delete()
         new_ball()
+
+def rebound_ball():
+    if (ball1.x - ball1.r <= 2) or (800 - (ball1.x + ball1.r) <= 2):
+        ball1.a=100000*(math.pi - ball1.a/100000)
+    if (ball1.y - ball1.r <= 2) or (600 - (ball1.y + ball1.r) <= 2):
+        ball1.a=100000*(2*math.pi - ball1.a/100000)
 
 
 def click(event): #функция обработки клика
