@@ -2,7 +2,30 @@ from tkinter import *
 from random import randrange as rnd, choice
 import math
 import time
+root = Tk()
 
+
+
+#задает размер окна и его расположение на экране (по центру)
+w = root.winfo_screenwidth()//2 - 400
+h = root.winfo_screenheight()//2 - 300
+root.geometry("800x600+{}+{}".format(w, h))
+flag = 0
+#задание переменных для подсчета и объектов для отображения счета очков
+count = 0
+x1 = y1 = r1 = 0
+cou = Label(root, font=("Comic Sans MS", 24, "bold"))
+cou.place(x = .5,y = .5)
+cou['text'] = count
+
+cou.pack()
+#создание холста
+canv = Canvas(root,bg='white')
+canv.pack(fill=BOTH,expand=1)
+
+
+
+#создание списка цветов для шариков и метода, создающего шарики рандомного цвета и размера в заданных пределах
 colors = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'old lace',
 'linen', 'antique white', 'papaya whip', 'blanched almond', 'bisque', 'peach puff',
 'navajo white', 'lemon chiffon', 'mint cream', 'azure', 'alice blue', 'lavender',
@@ -79,79 +102,45 @@ colors = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'ol
 'gray75', 'gray76', 'gray77', 'gray78', 'gray79', 'gray80', 'gray81', 'gray82', 'gray83',
 'gray84', 'gray85', 'gray86', 'gray87', 'gray88', 'gray89', 'gray90', 'gray91', 'gray92',
 'gray93', 'gray94', 'gray95', 'gray97', 'gray98', 'gray99']
-
-class Ball:
-    def __init__(self, canvas, x, y, r, v, a, kf = 0, flag = 0):
-        self.x = x
-        self.y = y
-        self.r = r
-        self.v = v
-        self.a = a
-        self.kf = kf
-        self.flag = flag
-        self.canvas = canvas
-        self.ball = canvas.create_oval(x-r,y-r,x+r,y+r,fill = choice(colors), width=0)
-
-    def kill(ball1):
-        ball1.kf = 1
-        canv.delete(ALL)
-
-root = Tk()
-w = root.winfo_screenwidth()//2 - 400
-h = root.winfo_screenheight()//2 - 300
-root.geometry("800x600+{}+{}".format(w, h))
-
-#задание переменных для подсчета и объектов для отображения счета очков
-count = 0
-x1 = y1 = r1 = 0
-cou = Label(root, font=("Comic Sans MS", 24, "bold"))
-cou.place(x = .5,y = .5)
-cou['text'] = count
-
-cou.pack() #размещение сверху холста счетчика
-#создание холста
-canv = Canvas(root,bg='white')
-canv.pack(fill=BOTH,expand=1)
-
-
 def new_ball():
+    global x,y,r,v,a #задана глобальность координат шарика для их использования в обработке клика мыши
     canv.delete(ALL) #удаление всего нарисованного с холста (пока это один шарик)
     x = rnd(100,700) #выбор рандомных значений шарика
     y = rnd(100,500)
     r = rnd(30,50)
     a = rnd(0,int(2*math.pi*100000))
-    v = 100
-    global ball1
-    ball1 = Ball(canv, x,y,r, v, a)
+    v = 10000#rnd(50,200)
+    global ball
+    ball = canv.create_oval(x-r,y-r,x+r,y+r,fill = choice(colors), width=0) #создает сам шарик
+    canv.create_oval(x-r,y-r,x+r,y+r,fill = choice(colors), width=0)
     move_ball()
 
+    #root.after(1000,new_ball) #вызывает себя же через заданное время
 def move_ball():
-    if ball1.kf != 1 and ball1.flag < 300 :
-        ball1.flag += 1
-        dx=dy=0
-        dx = ball1.v*math.cos(ball1.a/100000)/100
-        dy = -ball1.v*math.sin(ball1.a/100000)/100
-        ball1.x +=dx
-        ball1.y +=dy
-        canv.move(ball1.ball, dx, dy)
-        root.after(10, move_ball)
-    else :
-        new_ball()
-
+    global flag
+    flag += 1
+    dx = v*math.cos(a/100000)/10
+    dy = -v*math.sin(a/100000)/10
+    ball.canv.move(ball, x + dx*flag, y + dy*flag)
+    print(x + dx*flag, y + dy*flag)
+    print(flag)
+    root.after(100,move_ball)
 
 def click(event): #функция обработки клика
-    print("click")
-    if ball1.kf != 1:
-        if ((event.x-ball1.x)**2 + (event.y-ball1.y)**2) <= ball1.r**2:
-            global count
-            count += 1
-            cou['text'] = count #счётчик нажатий на шарики
-            canv.delete(ALL) #удаляет шарик после клика на него
-            ball1.kill() #метод ball, который отмечает, что шарик "убит"
-            print(ball1.kf)
-    else:
-        new_ball()
+    #global x1, y1, r1 #задана глобальность переменных, в которых сохраняются
+    #значения предыдущего шарика, на который кликнули
+    # для сравнения с координатами следующего (чтобы исключить случаи, когда )
+    if (((event.x-x)**2 + (event.y-y)**2)**0.5) <= r: #and (x!=x1 or y!=y1 or r1!=r):
+        global count
+        count += 1
+        cou['text'] = count
+        #x1 = x
+        #y1 = y
+        #r1 = r
+        canv.delete(ALL) #удаляет шарик после клика на него
+
 
 canv.bind('<Button-1>', click)
 new_ball()
+
 mainloop()

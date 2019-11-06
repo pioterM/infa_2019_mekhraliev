@@ -1,0 +1,29 @@
+[33mcommit ad771da5a381573b4d8be002c190193150ba7f35[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: PioterM <pioter.mehraliev@yandex.ru>
+Date:   Wed Sep 25 03:31:09 2019 +0300
+
+    Добавил task1.py - злой смайлик, пробное задание для выполнения на семинаре
+
+[33mcommit d15cc73c228f7788e0e600edea7fa780dd956b0a[m
+Author: PioterM <pioter.mehraliev@yandex.ru>
+Date:   Wed Sep 25 02:24:41 2019 +0300
+
+    Added не обязательные конструкции, пробую
+
+[33mcommit 81587e3420d881134a391c47e1f7c6a70097c3c7[m
+Author: PioterM <pioter.mehraliev@yandex.ru>
+Date:   Wed Sep 25 01:44:24 2019 +0300
+
+    Added grath.py - library for painting
+
+[33mcommit b738312368d2f735cc1628cd9664d75462801a7e[m
+Author: PioterM <pioter.mehraliev@yandex.ru>
+Date:   Wed Sep 25 01:29:36 2019 +0300
+
+    Added testing strings to README
+
+[33mcommit dfd7cccdd684375c890f9623a81375eb0cc5b3cd[m
+Author: Petr <36698561+pioterM@users.noreply.github.com>
+Date:   Tue Sep 24 21:44:25 2019 +0300
+
+    Initial commit

@@ -81,25 +81,31 @@ colors = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'ol
 'gray93', 'gray94', 'gray95', 'gray97', 'gray98', 'gray99']
 
 class Ball:
-    def __init__(self, canvas, x, y, r, v, a, kf = 0, flag = 0):
+    def __init__(self, canvas, x, y, r):
         self.x = x
         self.y = y
         self.r = r
-        self.v = v
-        self.a = a
-        self.kf = kf
-        self.flag = flag
         self.canvas = canvas
         self.ball = canvas.create_oval(x-r,y-r,x+r,y+r,fill = choice(colors), width=0)
+        
 
-    def kill(ball1):
-        ball1.kf = 1
-        canv.delete(ALL)
+    def move_ball(self, v, a):
+        global flag
+        self.v = v
+        self.a = a
+        flag += 1
+        dx = v*math.cos(a/100000)/100
+        dy = -v*math.sin(a/100000)/100
+        canv.move(self, x + dx*flag, y + dy*flag)
+        #root.after(10, ball1.move_ball(v,a))
+
+
 
 root = Tk()
 w = root.winfo_screenwidth()//2 - 400
 h = root.winfo_screenheight()//2 - 300
 root.geometry("800x600+{}+{}".format(w, h))
+flag = 0
 
 #задание переменных для подсчета и объектов для отображения счета очков
 count = 0
@@ -114,43 +120,29 @@ canv = Canvas(root,bg='white')
 canv.pack(fill=BOTH,expand=1)
 
 
+
+
 def new_ball():
+    global x,y,z,r,v,a
     canv.delete(ALL) #удаление всего нарисованного с холста (пока это один шарик)
     x = rnd(100,700) #выбор рандомных значений шарика
     y = rnd(100,500)
     r = rnd(30,50)
     a = rnd(0,int(2*math.pi*100000))
-    v = 100
+    v = rnd(50,200)
     global ball1
-    ball1 = Ball(canv, x,y,r, v, a)
-    move_ball()
-
-def move_ball():
-    if ball1.kf != 1 and ball1.flag < 300 :
-        ball1.flag += 1
-        dx=dy=0
-        dx = ball1.v*math.cos(ball1.a/100000)/100
-        dy = -ball1.v*math.sin(ball1.a/100000)/100
-        ball1.x +=dx
-        ball1.y +=dy
-        canv.move(ball1.ball, dx, dy)
-        root.after(10, move_ball)
-    else :
-        new_ball()
-
+    ball1 = Ball(canv, x,y,r)
+    print(v,a)
+    root.after(1000,new_ball)
 
 def click(event): #функция обработки клика
-    print("click")
-    if ball1.kf != 1:
-        if ((event.x-ball1.x)**2 + (event.y-ball1.y)**2) <= ball1.r**2:
-            global count
-            count += 1
-            cou['text'] = count #счётчик нажатий на шарики
-            canv.delete(ALL) #удаляет шарик после клика на него
-            ball1.kill() #метод ball, который отмечает, что шарик "убит"
-            print(ball1.kf)
-    else:
-        new_ball()
+    if (((event.x-x)**2 + (event.y-y)**2)**0.5) <= r:
+        global count
+        count += 1
+        cou['text'] = count
+        canv.delete(ALL) #удаляет шарик после клика на него
+
+
 
 canv.bind('<Button-1>', click)
 new_ball()
