@@ -1,9 +1,8 @@
 global n
-n = 5
+n = 2
 
 from tkinter import *
 from random import randrange as rnd, choice
-from threading import Thread
 import math
 import time
 
@@ -96,14 +95,13 @@ class Ball:
         self.canvas = canvas
         self.ball = canvas.create_oval(x-r,y-r,x+r,y+r,fill = choice(colors), width=0)
 
-    def kill(ball1):
-        ball1.kf = 1
-        canv.delete(ALL)
+    def kill(self):
+        self.kf = 1
 
 root = Tk()
 w = root.winfo_screenwidth()//2 - 400
-h = root.winfo_screenheight()//2 - 350
-root.geometry("800x650+{}+{}".format(w, h))
+h = root.winfo_screenheight()//2 - 300
+root.geometry("800x600+{}+{}".format(w, h))
 
 #задание переменных для подсчета и объектов для отображения счета очков
 count = 0
@@ -120,84 +118,66 @@ canv.pack(fill=BOTH,expand=1)
 global balls_list
 balls_list=[]
 
-print(balls_list)
-
 def create_balls():
-    i=0
     for i in range(n):
-        print(i, "create")
         x = x0 = rnd(100,700) #выбор рандомных значений шарика
         y = y0 = rnd(100,500)
         r = rnd(30,50)
         a = rnd(0,int(2*math.pi*100000))
         v = rnd(100,500)
-        #print("почти закончил...")
+        print("почти закончил...")
         balls_list.append(Ball(canv,x0,y0,x,y,r,v,a))
-    move_ballsss()
-
+        move_ball(i)
 
 
 def new_ball(i):
-    print(i)
     x = x0 = rnd(100,700) #выбор рандомных значений шарика
     y = y0 = rnd(100,500)
     r = rnd(30,50)
     a = rnd(0,int(2*math.pi*100000))
     v = rnd(100,500)
     balls_list[i] = Ball(canv,x0,y0,x,y,r,v,a)
+    move_ball(i)
 
 def move_ballsss():
     for i in range(n):
-        print(i, "move_ballsss")
         move_ball(i)
 
 
 def move_ball(i):
-    #print("сейчас буду двигать шары")
-    #if balls_list[i].kf != 1 and balls_list[i].flag < 500 :
-    print(i, "move_ball")
-    balls_list[i].flag += 1
-    dx=dy=0
-    dx = balls_list[i].v*math.cos(balls_list[i].a/100000)/100
-    dy = -balls_list[i].v*math.sin(balls_list[i].a/100000)/100
-    balls_list[i].x +=dx
-    balls_list[i].y +=dy
-    canv.move(balls_list[i].ball, dx, dy)
-    #print("вроде подвинул")
-    rebound_ball(i)
-    root.after(10, move_ball,i)
+    print("сейчас буду двигать шары")
+    if balls_list[i].kf != 1 :
+        balls_list[i].flag += 1
+        dx=dy=0
+        dx = balls_list[i].v*math.cos(balls_list[i].a/100000)/100
+        dy = -balls_list[i].v*math.sin(balls_list[i].a/100000)/100
+        balls_list[i].x +=dx
+        balls_list[i].y +=dy
+        canv.move(balls_list[i].ball, dx, dy)
+        rebound_ball(i)
+        root.after(10, move_ball, i)
+    else :
+        balls_list[i].kill()
+        new_ball(i)
 
 def rebound_ball(i):
     if (balls_list[i].x - balls_list[i].r <= 2) or (800 - (balls_list[i].x + balls_list[i].r) <= 2):
         balls_list[i].a=100000*(math.pi - balls_list[i].a/100000)
     if (balls_list[i].y - balls_list[i].r <= 2) or (600 - (balls_list[i].y + balls_list[i].r) <= 2):
         balls_list[i].a=100000*(2*math.pi - balls_list[i].a/100000)
-    for j in range(n):
-        if (balls_list[i].x - balls_list[j].x)**2 + (balls_list[i].y - balls_list[j].y)**2 <=(balls_list[i].r+balls_list[j].r+2)**2 and i!=j:
-            vxi = balls_list[i].v*math.cos(balls_list[i].a/100000)
-            vyi = -balls_list[i].v*math.sin(balls_list[i].a/100000)
-            vxj = balls_list[j].v*math.cos(balls_list[j].a/100000)
-            vyj = -balls_list[j].v*math.sin(balls_list[j].a/100000)
-            mi = balls_list[i].r ** 3
-            mj = balls_list[j].r ** 3
-            vcx = (vxi*mi+vxj*mj)/(mi+mj)
-            vcy = (vyi*mi+vyj*mj)/(mi+mj)
-            vxic = vxi-vcx
-            vxjc = vxj-vcx
-            vyic = vyi-vcy
-            vyjc = vyj-vcy
-            gamma = math.atan(balls_list[j].x-balls_list[i].x)/(balls_list[j].y-balls_list[i].y)
-            print(math.sin(balls_list[j].a/100000))
-            print()
-            print(vxi, vyi, vxj, vyj, mi, vcx, vcy, mi, mj, vxic, vyic, vxjc, vyjc)
-            print()
-            alpha = math.atan(-vyic/vxic)
-            balls_list[i].v = ((vcx*math.cos(gamma)-vxic*math.cos(2*gamma+alpha))**2 + (vyic*math.sin(2*gamma+alpha)+vxic*math.sin(2*gamma+alpha))**2)**0.5
-            balls_list[i].a = math.atan((vyic*math.sin(2*gamma+alpha)+vxic*math.sin(2*gamma+alpha))/(vcx*math.cos(gamma)-vxic*math.cos(2*gamma+alpha)))
-            balls_list[j].v = ((vcx*math.cos(gamma)+vxjc*math.cos(2*gamma+alpha))**2 + (vyjc*math.sin(2*gamma+alpha)+vxjc*math.sin(2*gamma+alpha))**2)**0.5
-            balls_list[j].a = math.atan((vyic*math.sin(2*gamma+alpha)+vxic*math.sin(2*gamma+alpha))/(vcx*math.cos(gamma)-vxic*math.cos(2*gamma+alpha)))
-            vxi=vyi=vxj=vyj=mi=vcx=vcy=mi=mj=vxic=vyic=vxjc=vyjc=gamma=alpha=0
 
+
+def click(event): #функция обработки клика
+    for i in range(n):
+        print("click")
+        if ((event.x-balls_list[i].x)**2 + (event.y-balls_list[i].y)**2) <= balls_list[i].r**2 and balls_list[i].kf!=1:
+            global count
+            count += 1
+            cou['text'] = count #счётчик нажатий на шарики
+            balls_list[i].kill() #метод ball, который отмечает, что шарик "убит"
+            new_ball(i)
+
+
+canv.bind('<Button-1>', click)
 create_balls()
-
 mainloop()
