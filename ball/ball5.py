@@ -1,5 +1,9 @@
+global n
+n = 50
+
 from tkinter import *
 from random import randrange as rnd, choice
+from threading import Thread
 import math
 import time
 
@@ -98,8 +102,8 @@ class Ball:
 
 root = Tk()
 w = root.winfo_screenwidth()//2 - 400
-h = root.winfo_screenheight()//2 - 300
-root.geometry("800x600+{}+{}".format(w, h))
+h = root.winfo_screenheight()//2 - 350
+root.geometry("800x650+{}+{}".format(w, h))
 
 #задание переменных для подсчета и объектов для отображения счета очков
 count = 0
@@ -113,58 +117,62 @@ cou.pack() #размещение сверху холста счетчика
 canv = Canvas(root,bg='white')
 canv.pack(fill=BOTH,expand=1)
 
+global balls_list
+balls_list=[]
 
-def new_ball():
+print(balls_list)
+
+def create_balls():
+    i=0
+    for i in range(n):
+        print(i, "create")
+        x = x0 = rnd(100,700) #выбор рандомных значений шарика
+        y = y0 = rnd(100,500)
+        r = rnd(30,50)
+        a = rnd(0,int(2*math.pi*100000))
+        v = rnd(100,500)
+        #print("почти закончил...")
+        balls_list.append(Ball(canv,x0,y0,x,y,r,v,a))
+    move_ballsss()
+
+
+
+def new_ball(i):
+    print(i)
     x = x0 = rnd(100,700) #выбор рандомных значений шарика
     y = y0 = rnd(100,500)
     r = rnd(30,50)
     a = rnd(0,int(2*math.pi*100000))
     v = rnd(100,500)
-    global ball1
-    ball1 = Ball(canv,x0,y0,x,y,r,v,a)
-    move_ball()
+    balls_list[i] = Ball(canv,x0,y0,x,y,r,v,a)
 
-def create_balls(n):
-    balls_list=[]
-    for i in range(10):
-        balls_list.append(Ball())
+def move_ballsss():
+    for i in range(n):
+        print(i, "move_ballsss")
+        move_ball(i)
 
 
-def move_ball():
-    if ball1.kf != 1 and ball1.flag < 500 :
-        ball1.flag += 1
-        dx=dy=0
-        dx = ball1.v*math.cos(ball1.a/100000)/100
-        dy = -ball1.v*math.sin(ball1.a/100000)/100
-        ball1.x +=dx
-        ball1.y +=dy
-        canv.move(ball1.ball, dx, dy)
-        rebound_ball()
-        root.after(10, move_ball)
-    else :
-        ball1.canvas.delete()
-        new_ball()
+def move_ball(i):
+    #print("сейчас буду двигать шары")
+    #if balls_list[i].kf != 1 and balls_list[i].flag < 500 :
+    print(i, "move_ball")
+    balls_list[i].flag += 1
+    dx=dy=0
+    dx = balls_list[i].v*math.cos(balls_list[i].a/100000)/100
+    dy = -balls_list[i].v*math.sin(balls_list[i].a/100000)/100
+    balls_list[i].x +=dx
+    balls_list[i].y +=dy
+    canv.move(balls_list[i].ball, dx, dy)
+    #print("вроде подвинул")
+    rebound_ball(i)
+    root.after(10, move_ball,i)
 
-def rebound_ball():
-    if (ball1.x - ball1.r <= 2) or (800 - (ball1.x + ball1.r) <= 2):
-        ball1.a=100000*(math.pi - ball1.a/100000)
-    if (ball1.y - ball1.r <= 2) or (600 - (ball1.y + ball1.r) <= 2):
-        ball1.a=100000*(2*math.pi - ball1.a/100000)
+def rebound_ball(i):
+    if (balls_list[i].x - balls_list[i].r <= 2) or (800 - (balls_list[i].x + balls_list[i].r) <= 2):
+        balls_list[i].a=100000*(math.pi - balls_list[i].a/100000)
+    if (balls_list[i].y - balls_list[i].r <= 2) or (600 - (balls_list[i].y + balls_list[i].r) <= 2):
+        balls_list[i].a=100000*(2*math.pi - balls_list[i].a/100000)
 
+create_balls()
 
-def click(event): #функция обработки клика
-    print("click")
-    if ball1.kf != 1:
-        if ((event.x-ball1.x)**2 + (event.y-ball1.y)**2) <= ball1.r**2:
-            global count
-            count += 1
-            cou['text'] = count #счётчик нажатий на шарики
-            canv.delete(ALL) #удаляет шарик после клика на него
-            ball1.kill() #метод ball, который отмечает, что шарик "убит"
-            print(ball1.kf)
-    else:
-        new_ball()
-
-canv.bind('<Button-1>', click)
-new_ball()
 mainloop()
