@@ -1,5 +1,5 @@
 global n
-n = 2
+n = 10
 
 from tkinter import *
 from random import randrange as rnd, choice
